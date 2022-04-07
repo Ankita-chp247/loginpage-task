@@ -20,7 +20,7 @@ const createOrganization = async (req, res, next) => {
       name: req.body.name,
       country: req.body.country,
       state: req.body.state,
-      city: req.body.city,
+      city: req.body.city,               
       createdBy: req.body,
       updatedBy: req.body,
     });
@@ -50,10 +50,10 @@ const organizationList = async (req, res, next) => {
   try {
 
     const organization = await OrganizationModel.find()
-    return res.send(200).json({
+    return res.send(200).json({                                                
 
-      totalorganizationlist: organization.length,                               
-      organization,
+      totalorganizationlist: organization.length,                                          
+      organization,                                                                             
 
     });
 

@@ -1,4 +1,5 @@
 "use strict";
+
 const { UserModel } = require("../models")
 const bcrypt = require("bcryptjs");
 const { validationResult } = require("express-validator");
@@ -62,17 +63,16 @@ const userLoginAction = async (req, res) => {
     }
 
     // generate JWT token code
-    return res.redirect("/organization");                                     
 
-    // const token = jwt.sign({ email: user.email }, process.env.JWT_SECRET, {
-    //     expiresIn: "1h"
-    // });
+    const token = jwt.sign({ email: user.email }, process.env.JWT_SECRET, {
+        expiresIn: "1h"
+    });
      
-    // return res.status(200).json(
-    //     { message: message.LOGIN_SUCCESS, 
-    //       token: token 
-    //     }
-    // );
+    return res.status(200).json(
+        { message: message.LOGIN_SUCCESS, 
+          token: token 
+        }
+    );
   } catch (error) {
     console.log(error);
     return res.status(500).json({
