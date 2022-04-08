@@ -52,7 +52,7 @@ const { message } = require("../common/message");
 
   if (!isPasswordCheck) {
       return res                     
-          .status(422)
+          .status(422)              
           .json({               
               errors: { message: message.PASSWORD_NOT_MATCH }
           });
@@ -64,7 +64,7 @@ const { message } = require("../common/message");
   });
 
   return res.status(200).json({ 
-      message: message.LOGIN_SUCCESS,
+      message: message.LOGIN_SUCCESS,                 
       token: token 
   });
 } catch (error) {

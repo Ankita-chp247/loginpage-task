@@ -50,7 +50,7 @@ const organizationList = async (req, res, next) => {
   try {
 
     const organization = await OrganizationModel.find()
-    return res.send(200).json({                                                
+    return res.status(200).json({                                                
 
       totalorganizationlist: organization.length,                                          
       organization,                                                                             
