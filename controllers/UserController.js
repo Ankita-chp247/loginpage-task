@@ -67,13 +67,12 @@ const userLoginAction = async (req, res) => {
     const token = jwt.sign({ email: user.email }, process.env.JWT_SECRET, {
         expiresIn: "1h"
     });
-    res.redirect("/organizationList")
      
-    // return res.status(200).json(
-    //     { message: message.LOGIN_SUCCESS, 
-    //       token: token 
-    //     }
-    // );
+    return res.status(200).json(
+        { message: message.LOGIN_SUCCESS, 
+          token: token 
+        }
+    );
   } catch (error) {
     console.log(error);
     return res.status(500).json({
