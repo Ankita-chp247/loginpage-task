@@ -26,9 +26,9 @@ const loginUser = async (req, res) => {
         firstName,
         lastName,
         email,
-        password: hashedPassword,
+        password: hashedPassword,            
     });
-    return res.status(200).json(
+    return res.status(200).json( 
         { message: message.USER_LOGIN }
     );
   } catch (error) {
@@ -45,19 +45,18 @@ const loginUser = async (req, res) => {
  * @returns JsonResponse
  */
 
-
 const userLoginAction = async (req, res) => {
   try {   
     const { email, password } = req.body;
-    const user = await UserModel.findOne({ email });
+    const user = await UserModel.findOne({ email });                  
 
     const isPasswordCheck = await bcrypt.compare(password, user.password);
     console.log(isPasswordCheck)
 
-    if (!isPasswordCheck) {                            
+    if (!isPasswordCheck) {                           
         return res                        
-            .status(422)               
-            .json({                        
+            .status(422)                                  
+            .json({                                
                 errors: { message: message.PASSWORD_NOT_MATCH }                 
             });
     }
@@ -67,7 +66,8 @@ const userLoginAction = async (req, res) => {
     const token = jwt.sign({ email: user.email }, process.env.JWT_SECRET, {
         expiresIn: "1h"
     });
-     
+     console.log("user login successfully!")
+
     return res.status(200).json(
         { message: message.LOGIN_SUCCESS, 
           token: token 
@@ -79,14 +79,14 @@ const userLoginAction = async (req, res) => {
       message: error.message ? error.message : message.ERROR_MESSAGE,
     });
   }
-
-
 }
+
 /**
  * Get only single record
  * @param { req, res }
  * @returns JsonResponse
  */
+
 const userList = async (req, res, next) => {
   try {
 
@@ -159,11 +159,10 @@ const deleteUser = async (req, res, next) => {
   }
 };
 
-
-
 /**
  * Export as a single common js module
  */
+
 module.exports = {
   loginUser,
   userLoginAction,

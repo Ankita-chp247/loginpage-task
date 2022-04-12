@@ -20,7 +20,7 @@ const createOrganization = async (req, res, next) => {
       name: req.body.name,
       country: req.body.country,
       state: req.body.state,
-      city: req.body.city,               
+      city: req.body.city,
       createdBy: req.body,
       updatedBy: req.body,
     });
@@ -40,30 +40,47 @@ const createOrganization = async (req, res, next) => {
 };
 
 /**
+ * show organization to user use searching , sorting, pagination
  * Get only single record
  * @param { req, res }
  * @returns JsonResponse
  */
 
 const organizationList = async (req, res, next) => {
-
   try {
+    const { search = "", page = 1, limit = 10, sort } = req.query;
 
-    const organization = await OrganizationModel.find()
-    return res.status(200).json({                                                
+    //ascending order
+    let sortBy = { state: 1 }
 
-      totalorganizationlist: organization.length,                                          
-      organization,                                                                             
+    if (sort) {
+      sortBy = JSON.parse(sort)
+    }
 
+    // search in name
+    let condition = {};
+    
+    if (search) {
+      condition["name"] = { $regex: search, $options: "i" };
+    }
+
+    //show in organization list
+    const organization = await OrganizationModel.find(condition)
+      .limit(limit * 1)
+      .skip((page - 1) * limit)
+      .select("name country state city ")
+      .sort(sortBy);
+
+    return res.status(200).json({
+      totalorganization: organization.length,
+      organization,
     });
-
-  } catch (error) {           
-    return res.status(500).json({                           
+  } catch (error) {
+    return res.status(500).json({
       message: error.message ? error.message : message.ERROR_MESSAGE,
-
     });
   }
-};
+}
 
 /**
  * update a record
@@ -74,20 +91,19 @@ const organizationList = async (req, res, next) => {
 const updateOranization = async (req, res, next) => {
   try {
     const organization = await OrganizationModel.findByIdAndUpdate(
-      req.params.id,              
+      req.params.id,
       {
-        $set: req.body,          
+        $set: req.body,
       },
       {
-        new: true,                       
-      }               
+        new: true,
+      }
     );
     res.send(organization);
     console.log("organization data updated successfully!");
-} catch (error) {
+  } catch (error) {
     return res.status(500).json({
       message: error.message ? error.message : message.ERROR_MESSAGE,
-
     });
   }
 };
@@ -102,17 +118,17 @@ const deleteOrganization = async (req, res, next) => {
   try {
     //const deleteuser = await user.find()
     const deleteOrganization = await OrganizationModel.findByIdAndDelete(req.params.id);
-  
+
     res.json(deleteOrganization);
 
-    console.log("Organization data  delete successfully!");                
+    console.log("Organization data  delete successfully!");
 
-} catch (error) {
-  return res.status(500).json({
-    message: error.message ? error.message : message.ERROR_MESSAGE,
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message ? error.message : message.ERROR_MESSAGE,
 
-  });
-}
+    });
+  }
 };
 
 

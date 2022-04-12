@@ -5,7 +5,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const session = require("express-session");
 const routes = require("./routes");
-const {seedersAdmin} = require("./seeders/Admin")
+const { seedersAdmin } = require("./seeders/Admin")
 const { engine } = require("express-handlebars");
 const path = require("path");
 const fs = require("fs");
@@ -31,8 +31,6 @@ app.engine(
   engine({
     extname: ".hbs",
     defaultLayout: "main",
-               
-
   })
 )
 
@@ -43,10 +41,8 @@ app.set("view engine", "hbs")
 app.set("views", path.join(__dirname, "views"));
 
 app.get("/", async (req, res) => {
-  res.render("login/index")     
-  
-
-})                   
+  res.render("login/index")
+})
 
 mongoose
   .connect(process.env.MONGODB_URI)
