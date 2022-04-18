@@ -2,6 +2,7 @@ require("dotenv").config();
 const bodyParser = require("body-parser");
 const http = require("http");
 const express = require("express");
+const nodemailer = require("nodemailer");
 const mongoose = require("mongoose");
 const session = require("express-session");
 const routes = require("./routes");

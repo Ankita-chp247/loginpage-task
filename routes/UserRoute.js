@@ -1,16 +1,18 @@
-const express = require('express')
+const express = require('express');
 const router = express.Router()
 const { UserController } = require('../controllers')
 const { Validations } = require('../middleware')
 const { UserValidations } = require("../validations");
+const{ tokenVerification } = require ("../common/token")
 
 
 router.post("/signup", UserValidations.SignupValidations, Validations.handleValidationErrors,
-    UserController.loginUser);
+    UserController.userCreate);
 
-router.post("/login", UserController.userLoginAction)
-router.put('/:id', UserController.updateUser)
-router.delete('/:id', UserController.deleteUser)
+router.post("/login",  UserController.userLogin)
+router.put('/:id', tokenVerification, UserController.updateUser)
+router.delete('/:id',tokenVerification, UserController.deleteUser)
 router.get('/list', UserController.userList)
+router.get('/detail', UserController.userDetails)
 
 module.exports = router      

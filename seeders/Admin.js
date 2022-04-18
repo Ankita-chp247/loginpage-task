@@ -10,12 +10,12 @@ const seedersAdmin = async () => {
       console.log("Admin already added !");
       return;
     }
-
+          
     //Create admin login using faker
 
-      const adminUser = new Array(5).fill(0).map((_, index) => ({
-        firstname: faker.name.firstName(),
-        lastname: faker.name.lastName(),                                        
+      const adminUser = new Array(1).fill(0).map((_, index) => ({
+        firstName: faker.name.firstName(),
+        lastName: faker.name.lastName(),                                        
         email: faker.internet.email(),
         password: bcryptjs.hashSync("password", 10),
         

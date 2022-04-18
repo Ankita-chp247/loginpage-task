@@ -27,7 +27,7 @@ const UserModel = require("../models/UserModel")
         }
 
     } catch (error) {
-        return res.status(422).send("User Details is Incorrect !");
+        return res.status(422).send("User Details Not Found !");
     }
 } 
 

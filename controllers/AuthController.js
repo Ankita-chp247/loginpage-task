@@ -14,7 +14,7 @@ const { message } = require("../common/message");
  * @returns JsonResponse
  */
 
- const adminLogin = async (req, res) => {
+ const adminCreate = async (req, res) => {
   try {
     const { firstName, lastName, email, password } = req.body;
 
@@ -44,7 +44,7 @@ const { message } = require("../common/message");
  * @returns JsonResponse
  */
 
- const adminLoginAction = async (req, res) => {         
+ const adminLogin = async (req, res) => {         
  try{
   const { email , password} = req.body;
   const admin = await UserModel.findOne({ email });
@@ -84,27 +84,12 @@ const { message } = require("../common/message");
  */
 
 
-const adminDelete = async(req, res) => {
-  try {
-      const admin = await UserModel.findByIdAndDelete(req.params.id);
-
-      res.status(200).json({
-          success: true,
-          message: message.ADMIN_DATA_DELETED,
-      });
-  }catch(error){
-      res.status(500).json({
-        message: error.message ? error.message : message.ERROR_MESSAGE,
-
-      });
-  }
-}
 
 /**
  * Export as a single common js module
  */
 module.exports = {
+  adminCreate,
   adminLogin,
-  adminLoginAction,
-  adminDelete
+  
 };

@@ -13,7 +13,7 @@ const SignupValidations = [
     .custom(async (value) => {
       const user = await UserModel.findOne({ email: value });                  
       if (user) {
-        throw new Error("Email is not found!");
+        throw new Error("Email is alredy registred !");
       }
     }),
   body("password")

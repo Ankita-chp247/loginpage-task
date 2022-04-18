@@ -7,10 +7,12 @@ const { UserValidations } = require("../validations");
 const {CheckValidations} = require("../validations")
 
 
+
 router.post("/signup", UserValidations.SignupValidations, Validations.handleValidationErrors,
-    AuthController.adminLogin);
-router.get("/login", CheckValidations.checkValidations, AuthController.adminLoginAction);
-router.delete('/', AuthController.adminDelete);
+    AuthController.adminCreate);
+    
+router.post("/login", CheckValidations.checkValidations,  AuthController.adminLogin);
+
 
 
 module.exports = router      

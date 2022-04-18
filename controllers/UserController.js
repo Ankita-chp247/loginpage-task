@@ -3,8 +3,10 @@
 const { UserModel } = require("../models")
 const bcrypt = require("bcryptjs");
 const { validationResult } = require("express-validator");
-const jwt = require ("jsonwebtoken")
+const jwt = require("jsonwebtoken")
 const { message } = require("../common/message");
+const { Email } = require("../utils/Email");
+//const { find } = require("../models/UserModel");
 
 
 
@@ -15,26 +17,46 @@ const { message } = require("../common/message");
  * @returns JsonResponse
  */
 
-const loginUser = async (req, res) => {
+const userCreate = async (req, res) => {
   try {
     const { firstName, lastName, email, password } = req.body
 
     const hashedPassword = await bcrypt.hash(password, 10);
-
     // save the data in database of user 
     await UserModel.create({
-        firstName,
-        lastName,
-        email,
-        password: hashedPassword,            
+      firstName,
+      lastName,
+      email,
+      password: hashedPassword,
     });
-    return res.status(200).json( 
-        { message: message.USER_LOGIN }
-    );
+
+
+    try {
+      const email = new Email();
+      await email.sendEmail(AvailableTemplates.REGISTERED_USER, {
+        firstName: `${createdUser.firstName}`,
+        lastName: `${createdUser.lastName}`,
+        password: `${password}`,
+        email: `${createdUser.email}`
+      });
+      await email.sendMail(createdUser.email);
+                 
+      return res.status(201).json({ message: message.USER_REGISTRATION, data: createdUser });
+    } catch (error) {
+      console.log(error);
+      return res.status(201).json({ message: message.USER_REGISTRATION_NO_EMAIL, data: createdUser });
+    }
+
+    // return res.status(200).json(
+    //   {
+    //     message: message.USER_LOGIN,
+    //     data: user
+    //   }
+    // );
   } catch (error) {
     console.log(error);
     return res.status(500).json({
-      message: error.message ? error.message : message.ERROR_MESSAGE,
+      message: message.ERROR_MESSAGE,
     });
   }
 };
@@ -45,38 +67,36 @@ const loginUser = async (req, res) => {
  * @returns JsonResponse
  */
 
-const userLoginAction = async (req, res) => {
-  try {   
+const userLogin = async (req, res) => {
+  try {
     const { email, password } = req.body;
-    const user = await UserModel.findOne({ email });                  
-
-    const isPasswordCheck = await bcrypt.compare(password, user.password);
-    console.log(isPasswordCheck)
-
-    if (!isPasswordCheck) {                           
-        return res                        
-            .status(422)                                  
-            .json({                                
-                errors: { message: message.PASSWORD_NOT_MATCH }                 
-            });
+    const user = await UserModel.findOne({ email });
+    if (!user) {
+      return res.status(404).json({
+        message: message.DATA_NOT_FOUND
+      })
     }
+    const isPasswordCheck = await bcrypt.compare(password, user.password);
+    if (!isPasswordCheck) {
+      return res.status(422).json({
+        errors: { message: message.PASSWORD_NOT_MATCH }
+      });
+    }
+    // generate JWT token code                                                
 
-    // generate JWT token code
-
-    const token = jwt.sign({ email: user.email }, process.env.JWT_SECRET, {
-        expiresIn: "1h"
+    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
+      expiresIn: "1h"
     });
-     console.log("user login successfully!")
+    console.log("user login successfully!")
 
-    return res.status(200).json(
-        { message: message.LOGIN_SUCCESS, 
-          token: token 
-        }
-    );
+    return res.status(200).json({
+      message: message.LOGIN_SUCCESS,
+      token: token,
+    });
   } catch (error) {
     console.log(error);
     return res.status(500).json({
-      message: error.message ? error.message : message.ERROR_MESSAGE,
+      message: message.ERROR_MESSAGE,
     });
   }
 }
@@ -90,21 +110,73 @@ const userLoginAction = async (req, res) => {
 const userList = async (req, res, next) => {
   try {
 
-    const user = await UserModel.find({ isDeleted: false })
+    const { search = "", page = 1, limit = 10, sort } = req.query;
 
-    console.log(user)
+    //search in sorting
+    let sortOrder = { firstName: -1 };
+    if (sort == "asc") {
+      sortOrder = {
+        firstName: 1,
+      };
+    } else if (sort == "dsc") {
+      sortOrder = {
+        firstName: -1,
+      };
+    }
+    // search in name
+    let condition = {};
+
+    if (search) {
+      condition["firstName"] = { $regex: search, $options: "i" };
+    }
+
+    //show in organization list
+    const user = await UserModel.find(condition)
+      .limit(limit * 1)
+      .skip((page - 1) * limit)
+      .select("firstName lastName email password ")
+      .sort(sortOrder);
+
+    const totaluserList = await UserModel.countDocuments(condition);
+    if (!totaluserList) {
+      return res.status(400).json({ message: message.DATA_NOT_FOUND, });
+    }
     return res.status(200).json({
-      message: message.USER_DATA_LIST,
-      data: user,
+      TotaluserList: totaluserList,
+      user,
     });
   } catch (error) {
-    console.log(error);
     return res.status(500).json({
-      message: error.message ? error.message : message.ERROR_MESSAGE,
+      message: message.ERROR_MESSAGE,
     });
   }
 }
 
+/**
+ * update a record
+ * @param { req, res }
+ * @returns JsonResponse
+ **/
+
+const userDetails = async (req, res) => {
+  try {
+    // show user details
+    const user = await UserModel.find();
+
+    if (!user) {
+      return res.status(404).json({
+        errors: { message: message.USER_NOT_FOUND }
+      });
+    }
+    return res.status(200).json({
+      data: user,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: message.ERROR_MESSAGE
+    })
+  }
+}
 
 /**
  * update a record
@@ -116,7 +188,8 @@ const updateUser = async (req, res, next) => {
   try {
     const id = req.params.id;
     const { body } = req
-    const user = await UserModel.find({ _id: { $ne: id }, email: body.email, isDeleted: false }).select({ "password": 0 })
+    const user = await UserModel.find({ _id: { $ne: id }, email: body.email }).select({ "password": 0 })
+
     if (user.length > 0) {
       return res.status(404).json({
         message: message.EMAIL_ALREADY_EXISTS,
@@ -130,7 +203,7 @@ const updateUser = async (req, res, next) => {
     });
   } catch (error) {
     return res.status(500).json({
-      message: error.message ? error.message : message.ERROR_MESSAGE,
+      message: message.ERROR_MESSAGE,
     });
 
   }
@@ -141,21 +214,25 @@ const updateUser = async (req, res, next) => {
  * @param { req, res }
  * @returns JsonResponse
  */
+
 const deleteUser = async (req, res, next) => {
   try {
-    //const deleteuser = await user.find()
-    
-    const user = await user.findByIdAndDelete(req.params.id);
-                             
-      res.status(200).json({
-          success: true,
-          message: message.USER_DATA_DELETED,
+    const id = req.params.id;
+    const user = await UserModel.findOne({ _id: id });
+    if (!user) {
+      return res.status(404).json({
+        message: message.DATA_NOT_FOUND,
       });
-  }catch(error){
-      res.status(500).json({
-        message: error.message ? error.message : message.ERROR_MESSAGE,
+    }
+    await UserModel.deleteOne({ _id: id })
 
-      });
+    return res.status(200).json({ message: message.USER_DATA_DELETED });
+
+  } catch (error) {
+    return res.status(500).json({
+      message: message.ERROR_MESSAGE,
+
+    });
   }
 };
 
@@ -164,9 +241,10 @@ const deleteUser = async (req, res, next) => {
  */
 
 module.exports = {
-  loginUser,
-  userLoginAction,
+  userCreate,
+  userLogin,
   userList,
+  userDetails,
   updateUser,
   deleteUser
 };
