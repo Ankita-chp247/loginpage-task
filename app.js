@@ -10,6 +10,8 @@ const { seedersAdmin } = require("./seeders/Admin")
 const { engine } = require("express-handlebars");
 const path = require("path");
 const fs = require("fs");
+const res = require("express/lib/response");
+const { templates } = require("handlebars");
 
 
 const app = express();

@@ -16,7 +16,8 @@ const createOrganization = async (req, res, next) => {
 
   try {
     const organization = await new OrganizationModel({
-    
+      
+    user:req.body.user,
       name: req.body.name,
       country: req.body.country,
       state: req.body.state,
@@ -48,35 +49,30 @@ const createOrganization = async (req, res, next) => {
 const organizationList = async (req, res, next) => {
   try {
 
-    const { search = "", page = 1, limit = 10, sort } = req.query;
+    const { search = "", page = 1, limit = 10, sort, sortBy, users } = req.query;
+    
+    console.log("sort..", sort);
+      let sortOrder = { [sortBy]: sort === "desc" ? -1 : 1 };
 
-    let sortOrder = { name: -1 };
-    if (sort == "asc") {
-      sortOrder = {                  
-        name: 1,
-      };
-    } else if (sort == "dsc") {
-      sortOrder = {
-        name: -1,
-      };
-    }
     // search in name
-    let condition = {};
+ let condition = {};
 
-    if (search) {
+    if (search) {              
       condition["name"] = { $regex: search, $options: "i" };
-      
     }
-      //show in user list
-  const user = await UserModel .find(condition)
-         .select("firstName lastName email password")                
-
+     
+    //user
+    if (users) {
+      condition = { user: users.split(',') }
+  }   
         //show in organization list
     const organization = await OrganizationModel.find(condition)
+       .populate("user")
       .limit(limit * 1)
       .skip((page - 1) * limit)
       .select("name country state city ")                              
       .sort(sortOrder);
+      
 
     const totalorganizationList = await OrganizationModel.countDocuments(condition);
     if (!totalorganizationList) {
@@ -88,8 +84,7 @@ const organizationList = async (req, res, next) => {
     return res.status(200).json({
       TotalorganizationList: totalorganizationList,
       organization,
-      totaluser: user.length,
-      user,
+     
     });
   } catch (error) {
     return res.status(500).json({

@@ -5,7 +5,7 @@ const bcrypt = require("bcryptjs");
 const { validationResult } = require("express-validator");
 const jwt = require("jsonwebtoken")
 const { message } = require("../common/message");
-const { Email } = require("../utils/Email");
+const { Email, AVAILABLE_TEMPLATES } = require("../utils/Email");
 //const { find } = require("../models/UserModel");
 
 
@@ -30,29 +30,12 @@ const userCreate = async (req, res) => {
       password: hashedPassword,
     });
 
-
-    try {
-      const email = new Email();
-      await email.sendEmail(AvailableTemplates.REGISTERED_USER, {
-        firstName: `${createdUser.firstName}`,
-        lastName: `${createdUser.lastName}`,
-        password: `${password}`,
-        email: `${createdUser.email}`
-      });
-      await email.sendMail(createdUser.email);
-                 
-      return res.status(201).json({ message: message.USER_REGISTRATION, data: createdUser });
-    } catch (error) {
-      console.log(error);
-      return res.status(201).json({ message: message.USER_REGISTRATION_NO_EMAIL, data: createdUser });
-    }
-
-    // return res.status(200).json(
-    //   {
-    //     message: message.USER_LOGIN,
-    //     data: user
-    //   }
-    // );
+  return res.status(200).json(
+      {
+        message: message.USER_LOGIN,
+        data: user
+      }
+    );
   } catch (error) {
     console.log(error);
     return res.status(500).json({
@@ -72,7 +55,7 @@ const userLogin = async (req, res) => {
     const { email, password } = req.body;
     const user = await UserModel.findOne({ email });
     if (!user) {
-      return res.status(404).json({
+      return res.status(404).json({               
         message: message.DATA_NOT_FOUND
       })
     }
@@ -87,9 +70,27 @@ const userLogin = async (req, res) => {
     const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
       expiresIn: "1h"
     });
-    console.log("user login successfully!")
-
-    return res.status(200).json({
+    // console.log("user login successfully!")
+    
+   try {
+      const email = req.body
+      console.log(email);
+  const emailClient = new Email();
+       emailClient.setTemplate(AVAILABLE_TEMPLATES.REQUEST);
+       
+       emailClient.setBody();                                        
+       emailClient.send(email);                                                                                                                                                                                                                                                             
+                                                                                                                                                                                                           
+   }
+     catch (error) {
+    return res.status(500).json({                                      
+    success: false,                                                                                                                                                                    
+      message:                                                
+        "We are having some error . Please try again after some time.",
+      error: error                                                                
+    });
+  }
+return res.status(200).json({
       message: message.LOGIN_SUCCESS,
       token: token,
     });
@@ -110,19 +111,13 @@ const userLogin = async (req, res) => {
 const userList = async (req, res, next) => {
   try {
 
-    const { search = "", page = 1, limit = 10, sort } = req.query;
+    const { search = "", page = 1, limit = 10, sort,sortBy } = req.query;
 
     //search in sorting
-    let sortOrder = { firstName: -1 };
-    if (sort == "asc") {
-      sortOrder = {
-        firstName: 1,
-      };
-    } else if (sort == "dsc") {
-      sortOrder = {
-        firstName: -1,
-      };
-    }
+    console.log("sort..", sort);
+    let sortOrder = { [sortBy]: sort === "desc" ? -1 : 1 };
+
+
     // search in name
     let condition = {};
 

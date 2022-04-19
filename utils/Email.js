@@ -6,14 +6,15 @@ const { Console } = require("console");
 
 const AVAILABLE_TEMPLATES = {
   REQUEST : "login successfully !",
+  //REGISTERED_USER: "registration"
 };
 
 class Email {
   constructor(template = "") {
     this.body = "";                    
-    this.subject = "";
+    this.subject = "";               
     this.cc = [];          
-    if (template) {                              
+    if (template) {                                       
       this.setTemplate(template);
     }
   }
@@ -38,8 +39,7 @@ class Email {
     if (!this.template) {
       throw new Error("Template not set");
     }
-    const fileBody = fs
-      .readFileSync(
+    const fileBody = fs.readFileSync(
         path.join(__dirname, "..", `views/templates/${this.template}.hbs`)
       )
       .toString();
@@ -71,7 +71,7 @@ class Email {
 
     const transporter = nodemailer.createTransport({
       host: "smtp.gmail.com",                              
-      port: 587,                                                
+      port: 465,                                                
       secure: true,  
       auth: {                                              
         user: process.env.EMAIL_USERNAME,
@@ -93,6 +93,8 @@ class Email {
     const emailClient = new Email(template);
     emailClient.setBody(data);
     emailClient.setCC(cc);
+
+    console.log("Email Sent :"+data.response);
     return emailClient.send(email);
   }
 }
