@@ -1,105 +1,60 @@
-const fs = require("fs");
-const path = require("path");
-const handlebar = require("handlebars");
 const nodemailer = require("nodemailer");
-const { Console } = require("console");
 
-const AVAILABLE_TEMPLATES = {
-  REQUEST : "login successfully !",
-  //REGISTERED_USER: "registration"
-};
 
 class Email {
   constructor(template = "") {
-    this.body = "";                    
-    this.subject = "";               
-    this.cc = [];          
-    if (template) {                                       
-      this.setTemplate(template);
-    }
+    this.subject = "";
+    this.body = "";
+    this.cc = [];
   }
-
-  setTemplate(template) {
-    if (!Object.values(AVAILABLE_TEMPLATES).includes(template)) {
-      throw new Error("Invalid template");     
-    }
-
-    this.template = template;
-    switch (template) {
-      case AVAILABLE_TEMPLATES.REQUEST:
-        this.subject = "login successfully !";
-        break;
-
-      default:
-        break;
-    }
-  }
-
-  setBody(data) {
-    if (!this.template) {
-      throw new Error("Template not set");
-    }
-    const fileBody = fs.readFileSync(
-        path.join(__dirname, "..", `views/templates/${this.template}.hbs`)
-      )
-      .toString();
-      
-    const template = handlebar.compile(fileBody);             
-
-    this.body = template(data);           
+  setSubject(subject) {
+    this.subject = subject;
   }
 
   setRawBody(body) {
     this.body = body;
   }
 
-  setSubject(subject) {
-    this.subject = subject;
+  setBody(data) {
+    this.body = data;
   }
-
   setCC(email) {
     this.cc = email;
   }
 
-  async sendEmail(email) {
+  async send(email) {
     if (!email) {
-      throw new Error("Email not set");     
-    }
-    if (!this.body || !this.subject) {
-      throw new Error("Body or subject not set");
+      throw new Error("Email not set");
     }
 
     const transporter = nodemailer.createTransport({
-      host: "smtp.gmail.com",                              
-      port: 465,                                                
-      secure: true,  
-      auth: {                                              
+      host: "smtp.gmail.com",
+      port: 465,
+      secure: true,
+      auth: {
         user: process.env.EMAIL_USERNAME,
         pass: process.env.EMAIL_PASSWORD,
       },
     });
 
-    const info = await transporter.sendMail({
-      from: `"Test-3" <${process.env.EMAIL_USERNAME}>`,
+    const info = transporter.sendMail({
+      from: `"Test" <${process.env.EMAIL_USERNAME}`,
       to: email,
-      subject: "login successfully!",
-      html: this.body,        
+      subject: "login successfully !",
+      html: this.body,
     });
-
     return info;
   }
 
-  static sendEmail(template, data, email, cc = []) {
-    const emailClient = new Email(template);
+  static sendEmail(data, email, cc = []) {
+    const emailClient = new Email();
     emailClient.setBody(data);
+    emailClient.setSubject(subject);
     emailClient.setCC(cc);
-
-    console.log("Email Sent :"+data.response);
     return emailClient.send(email);
   }
 }
-
 module.exports = {
   Email,
-  AVAILABLE_TEMPLATES,
-};
+}
+
