@@ -16,17 +16,17 @@ const createOrganization = async (req, res, next) => {
 
   try {
     const organization = await new OrganizationModel({
-      
-    user:req.body.user,
+
+      user: req.body.user,
       name: req.body.name,
       country: req.body.country,
       state: req.body.state,
-      city: req.body.city,                                    
+      city: req.body.city,
 
     });
-     await organization.save();
+    await organization.save();
     res.status(200).json({
-      message: message.ORGANIZATION_ADDED,   
+      message: message.ORGANIZATION_ADDED,
       data: organization
     })
     console.log("Organization created successfully!");
@@ -50,29 +50,30 @@ const organizationList = async (req, res, next) => {
   try {
 
     const { search = "", page = 1, limit = 10, sort, sortBy, users } = req.query;
-    
+
+    //sorting
     console.log("sort..", sort);
-      let sortOrder = { [sortBy]: sort === "desc" ? -1 : 1 };
+    let sortOrder = { [sortBy]: sort === "desc" ? -1 : 1 };
 
     // search in name
- let condition = {};
+    let condition = {};
 
-    if (search) {              
+    if (search) {
       condition["name"] = { $regex: search, $options: "i" };
     }
-     
+
     //user
     if (users) {
       condition = { user: users.split(',') }
-  }   
-        //show in organization list
+    }
+    //show in organization list
     const organization = await OrganizationModel.find(condition)
-       .populate("user")
+      .populate("user")
       .limit(limit * 1)
       .skip((page - 1) * limit)
-      .select("name country state city ")                              
+      .select("name country state city ")
       .sort(sortOrder);
-      
+
 
     const totalorganizationList = await OrganizationModel.countDocuments(condition);
     if (!totalorganizationList) {
@@ -84,7 +85,7 @@ const organizationList = async (req, res, next) => {
     return res.status(200).json({
       TotalorganizationList: totalorganizationList,
       organization,
-     
+
     });
   } catch (error) {
     return res.status(500).json({
@@ -101,8 +102,8 @@ const organizationList = async (req, res, next) => {
 
 const organizationDetails = async (req, res) => {
   try {
-    // show 
-    const organization = await OrganizationModel.find();            
+    
+    const organization = await OrganizationModel.find();
 
     if (organization) {
 
@@ -137,7 +138,7 @@ const updateOranization = async (req, res, next) => {
         new: true,
       }
     );
-    res.send(organization);       
+    res.send(organization);
     console.log("organization data updated successfully!");
   } catch (error) {
     return res.status(500).json({
