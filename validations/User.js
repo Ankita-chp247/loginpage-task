@@ -24,6 +24,8 @@ const SignupValidations = [
     .withMessage("Password must be at least 8 characters long")
     .isStrongPassword()
     .withMessage("Please select a stronger password"),
+
+    body("userRole").not().isEmpty().withMessage("Please enter user role.").trim()
 ];
 
 module.exports = {

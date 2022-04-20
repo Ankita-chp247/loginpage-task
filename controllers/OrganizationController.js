@@ -129,22 +129,47 @@ const organizationDetails = async (req, res) => {
 
 const updateOranization = async (req, res, next) => {
   try {
-    const organization = await OrganizationModel.findByIdAndUpdate(
-      req.params.id,
-      {
-        $set: req.body,
-      },
-      {
-        new: true,
-      }
-    );
-    res.send(organization);
-    console.log("organization data updated successfully!");
+    //const deleteuser = await user.find()
+    const id = req.params.id;
+    const organization = await OrganizationModel.findOne({ _id: id });
+    if (!organization) {
+      return res.status(404).json({
+        message: message.DATA_NOT_FOUND,
+      });
+    }
+    await OrganizationModel.updateOne({ _id: id} , {$set: req.body,})
+
+    return res.status(200).json({ 
+      message: "organization data updated successfully!",
+      data: organization
+     });
+
   } catch (error) {
     return res.status(500).json({
       message: message.ERROR_MESSAGE,
+
     });
   }
+
+
+
+// try {
+//     const organization = await OrganizationModel.findByIdAndUpdate(
+//       req.params.id,
+//       {
+//         $set: req.body,
+//       },
+//       {
+//         new: true,
+//       }
+//     );
+//     res.send(organization);
+//     console.log("organization data updated successfully!");
+//   } catch (error) {
+//     return res.status(500).json({
+//       message: message.ERROR_MESSAGE,
+//     });
+//   }
 };
 
 /**
@@ -174,9 +199,6 @@ const deleteOrganization = async (req, res, next) => {
     });
   }
 };
-
-
-
 /**
  * Export as a single common js module
  */

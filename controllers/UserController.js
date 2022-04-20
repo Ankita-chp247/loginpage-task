@@ -19,7 +19,7 @@ const { Email } = require("../utils/Email");
 
 const userCreate = async (req, res) => {
   try {
-    const { firstName, lastName, email, password } = req.body
+    const { firstName, lastName, email, password, userRole } = req.body
 
     const hashedPassword = await bcrypt.hash(password, 10);
     // save the data in database of user 
@@ -28,6 +28,7 @@ const userCreate = async (req, res) => {
       lastName,
       email,
       password: hashedPassword,
+      userRole
     });
 
     return res.status(200).json(
@@ -82,15 +83,13 @@ const userLogin = async (req, res) => {
     catch (error) {
       return res.status(500).json({
         success: false,
-        message:
-          "We are having some error . Please try again after some time.",
-        error: error
+        message: message.ERROR_MESSAGE,
       });
     }
     return res.status(200).json({
       message: message.LOGIN_SUCCESS,
       token: token,
-    });
+    }); 
   } catch (error) {
     console.log(error);
     return res.status(500).json({
@@ -187,8 +186,8 @@ const updateUser = async (req, res, next) => {
       });
     }
     await UserModel.updateOne({ _id: id }, { $set: body })
-    return res.status(200).json({ 
-      success: true, 
+    return res.status(200).json({
+      success: true,
       message: message.USER_DATA_UPDATED,
 
     });
