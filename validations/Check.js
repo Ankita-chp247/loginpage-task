@@ -1,4 +1,5 @@
 const UserModel = require("../models/UserModel")
+const bcrypt = require("bcryptjs")
 
 /**
  * checkout admin email and password exist or not
@@ -7,29 +8,46 @@ const UserModel = require("../models/UserModel")
     try {
 
         const { email, password } = req.body;
-        const user = await UserModel.findOne({ email });
+        const user = await UserModel.findOne({ email });   
+
+        console.log("user", user)               
+
         if (!user) {
             return res.status(422).json({
                 success: false,
-                message:  "Please login your account",
+                message:"Registerd",
                 error: error
             });
         }
-        if (user.email === email && user.password === password) {
 
+        //const isMatch = await bcrypt.compare(password, user.password);
+        if(user.password== password)
+        {
+            req.userId = user.id
             next();
         }
-        if (user.password !== password) {
-            return res.status(422).send("Your Password is Incorrect !");
-        }
+
+//console.log(isMatch)
+        // if(isMatch){
+        //     req.userId = user.id
+        //     next();
+        // }
+      
         if (user.email !== email) {
-            return res.status(422).send("Your Email is Incorrect !");
+            
+            return res.status(422).json({
+                message: " Email incorect!"
+            });
         }
 
     } catch (error) {
-        return res.status(422).send("User Details Not Found !");
-    }
-} 
+
+    
+        return res.status(422).json({
+            message: "User details incorrect !"
+        });
+  }
+}
 
 module.exports = { 
     checkValidations,

@@ -47,25 +47,10 @@ const adminCreate = async (req, res) => {
 
 const adminLogin = async (req, res) => {
   try {
-    const { email, password } = req.body;
-    const admin = await UserModel.findOne({ email });
-    if (!admin) {
-      return res.status(404).json({
-        message: message.DATA_NOT_FOUND
-      })
-    }
-    const isPasswordCheck = await bcrypt.compare(password, admin.password);
+     // create JWT token 
 
-    if (!isPasswordCheck) {
-      return res
-        .status(422)
-        .json({
-          errors: { message: message.PASSWORD_NOT_MATCH }
-        });
-    }
-    // create JWT token 
-
-    const token = jwt.sign({ id: admin.id }, process.env.JWT_SECRET, {
+    const{userId } = req
+    const token = jwt.sign({ id: userId }, process.env.JWT_SECRET, {
       expiresIn: "1h"
     });
 

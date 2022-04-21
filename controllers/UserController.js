@@ -71,7 +71,7 @@ const userLogin = async (req, res) => {
     const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
       expiresIn: "1h"
     });
-    // console.log("user login successfully!")
+    console.log("user login successfully!")
 
     try {
       const { email } = req.body
@@ -195,7 +195,6 @@ const updateUser = async (req, res, next) => {
     return res.status(500).json({
       message: message.ERROR_MESSAGE,
     });
-
   }
 };
 

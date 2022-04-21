@@ -6,8 +6,8 @@ const bcrypt = require ("bcryptjs");
 
 const seedersAdmin = async () => {
   try {
-    const adminEmail = ""
-    const password = "";
+    const adminEmail = "ankita21@gmail.com"
+    const password = "Ankita@247";
     
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -21,7 +21,7 @@ const seedersAdmin = async () => {
         lastName: "adminn",   
         email: adminEmail,   
         password: hashedPassword,
-        userRole: role.id
+        userRole: 'Admin'
       });               
       console.log("SuperAdmin Successfully Registered");
     } else {

@@ -49,7 +49,7 @@ const createOrganization = async (req, res, next) => {
 const organizationList = async (req, res, next) => {
   try {
 
-    const { search = "", page = 1, limit = 10, sort, sortBy, users } = req.query;
+    const { search = "",searchBy, page = 1, limit = 10, sort, sortBy, users } = req.query;
 
     //sorting
     console.log("sort..", sort);
@@ -59,7 +59,7 @@ const organizationList = async (req, res, next) => {
     let condition = {};
 
     if (search) {
-      condition["name"] = { $regex: search, $options: "i" };
+      condition[searchBy] = { $regex: search, $options: "i" };
     }
 
     //user
@@ -105,7 +105,7 @@ const organizationDetails = async (req, res) => {
     
     const organization = await OrganizationModel.find();
 
-    if (organization) {
+    if (!organization) {
 
       return res.status(422).json({
         errors: { message: message.ORGANIZATION_NOT_Found }
