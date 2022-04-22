@@ -59,7 +59,7 @@ const organizationList = async (req, res, next) => {
     let condition = {};
 
     if (search) {
-      condition[searchBy] = { $regex: search, $options: "i" };
+      condition[searchBy] = { $regex: search, $options: "i" };     
     }
 
     //user
