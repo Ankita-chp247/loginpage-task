@@ -34,7 +34,7 @@ const userCreate = async (req, res) => {
     return res.status(200).json(
       {
         message: message.USER_LOGIN,
-        data: user
+        //data: user
       }
     );
   } catch (error) {
@@ -61,7 +61,7 @@ const userLogin = async (req, res) => {
       })
     }
     const isPasswordCheck = await bcrypt.compare(password, user.password);
-    if (!isPasswordCheck) {
+    if (!isPasswordCheck) {   
       return res.status(422).json({
         errors: { message: message.PASSWORD_NOT_MATCH }
       });
@@ -89,7 +89,7 @@ const userLogin = async (req, res) => {
     return res.status(200).json({
       message: message.LOGIN_SUCCESS,
       token: token,
-    }); 
+    });
   } catch (error) {
     console.log(error);
     return res.status(500).json({
@@ -123,7 +123,7 @@ const userList = async (req, res, next) => {
     //show in organization list
     const user = await UserModel.find(condition)
       .limit(limit * 1)
-      .skip((page - 1) * limit)
+      .skip((page - 1) * limit)                        
       .select("firstName lastName email password ")
       .sort(sortOrder);
 
@@ -132,7 +132,7 @@ const userList = async (req, res, next) => {
       return res.status(400).json({ message: message.DATA_NOT_FOUND, });
     }
     return res.status(200).json({
-      TotaluserList: totaluserList,
+      TotaluserList: totaluserList,  
       user,
     });
   } catch (error) {
@@ -151,7 +151,7 @@ const userList = async (req, res, next) => {
 const userDetails = async (req, res) => {
   try {
     // show user details
-    const user = await UserModel.find();
+    const user = await UserModel.find(); 
 
     if (!user) {
       return res.status(404).json({
@@ -186,7 +186,7 @@ const updateUser = async (req, res, next) => {
       });
     }
     await UserModel.updateOne({ _id: id }, { $set: body })
-    return res.status(200).json({
+    return res.status(200).json({ 
       success: true,
       message: message.USER_DATA_UPDATED,
 

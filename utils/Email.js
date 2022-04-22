@@ -41,6 +41,7 @@ class Email {
       from: `"Test" <${process.env.EMAIL_USERNAME}`,
       to: email,
       subject: "login successfully !",
+      text: "Login Successfully !",
       html: this.body,
     });
     return info;
