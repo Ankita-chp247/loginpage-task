@@ -21,6 +21,7 @@ const message = {
     ORGANIZATION_ADDED: "Organization data created successfully!",
     ORGANIZATION_LIST: "Organization list created successfully!",
     ORGANIZATION_UPDATED: "Organization updated successfully!",
+    ORGANIZATION_DETAILS: "Organization deatils!",
     ORGANIZATION_NOT_Found: "Organization not found!",
     ORGANIZATION_DELETED:"Organization deleted successfully!"
 

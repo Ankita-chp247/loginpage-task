@@ -49,7 +49,7 @@ const createOrganization = async (req, res, next) => {
 const organizationList = async (req, res, next) => {
   try {
 
-    const { search = "",searchBy, page = 1, limit = 10, sort, sortBy, users } = req.query;
+    const { search = "", searchBy, page = 1, limit = 10, sort, sortBy, users } = req.query;
 
     //sorting
     console.log("sort..", sort);
@@ -59,13 +59,13 @@ const organizationList = async (req, res, next) => {
     let condition = {};
 
     if (search) {
-      condition[searchBy] = { $regex: search, $options: "i" };     
+      condition[searchBy] = { $regex: search, $options: "i" };
     }
 
     //user
-    if (users) {
-      condition = { user: users.split(',') }
-    }
+    // if (users) {
+    //   condition = { user: users.split(',') }
+    // }
     //show in organization list
     const organization = await OrganizationModel.find(condition)
       .populate("user")
@@ -102,23 +102,22 @@ const organizationList = async (req, res, next) => {
 
 const organizationDetails = async (req, res) => {
   try {
-    
-    const organization = await OrganizationModel.find();
+    const { params } = req;
+    const { id } = params;
+    const organizationDetails = await OrganizationModel.findOne({ _id: id })
 
-    if (!organization) {
-
-      return res.status(422).json({
-        errors: { message: message.ORGANIZATION_NOT_Found }
-      });
+    if (organizationDetails) {
+      return res.status(200).json({ message: message.ORGANIZATION_DETAILS, organizationDetails });
     }
-    return res.status(200).json({
-      data: organization,
+    return res.status(404).json({
+      message: message.DATA_NOT_FOUND
     });
   } catch (error) {
     return res.status(500).json({
-      message: message.ERROR_MESSAGE
-    })
+      message: error.message ? error.message : message.ERROR_MESSAGE,
+    });
   }
+
 }
 
 /**
@@ -137,12 +136,12 @@ const updateOranization = async (req, res, next) => {
         message: message.DATA_NOT_FOUND,
       });
     }
-    await OrganizationModel.updateOne({ _id: id} , {$set: req.body,})
+    await OrganizationModel.updateOne({ _id: id }, { $set: req.body, })
 
-    return res.status(200).json({ 
+    return res.status(200).json({
       message: "organization data updated successfully!",
       data: organization
-     });
+    });
 
   } catch (error) {
     return res.status(500).json({
@@ -153,23 +152,23 @@ const updateOranization = async (req, res, next) => {
 
 
 
-// try {
-//     const organization = await OrganizationModel.findByIdAndUpdate(
-//       req.params.id,
-//       {
-//         $set: req.body,
-//       },
-//       {
-//         new: true,
-//       }
-//     );
-//     res.send(organization);
-//     console.log("organization data updated successfully!");
-//   } catch (error) {
-//     return res.status(500).json({
-//       message: message.ERROR_MESSAGE,
-//     });
-//   }
+  // try {
+  //     const organization = await OrganizationModel.findByIdAndUpdate(
+  //       req.params.id,
+  //       {
+  //         $set: req.body,
+  //       },
+  //       {
+  //         new: true,
+  //       }
+  //     );
+  //     res.send(organization);
+  //     console.log("organization data updated successfully!");
+  //   } catch (error) {
+  //     return res.status(500).json({
+  //       message: message.ERROR_MESSAGE,
+  //     });
+  //   }
 };
 
 /**

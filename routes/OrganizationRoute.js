@@ -11,6 +11,6 @@ OrganizationController.createOrganization)
 router.put('/up/:id', OrganizationController.updateOranization)
 router.delete('/:id', OrganizationController.deleteOrganization)
 router.get('/list', OrganizationController.organizationList)   
-router.get('/detail', OrganizationController.organizationDetails)                                                        
+router.get('/detail/:id', OrganizationController.organizationDetails)                                                        
 
 module.exports = router               

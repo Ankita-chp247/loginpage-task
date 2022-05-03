@@ -19,11 +19,13 @@ const tokenVerification = async (req, res, next) => {
 
         const token = req.headers['x-access-token'];  
         console.log(token)
-                                                                                                                                                      
+        if (!token) return res.status(401).json({ 
+            message: message.AUTH_ERROR 
+        });
         const id  = await decode(token);
 
         console.log(" get " + id)  
-        const user = await UserModel.findById(id)                                                                                                                                                                                         
+        const user = await UserModel.findById(id)                                                                                                                                                                                          
  
         if (!user) {                                                       
             return res.status(500).json(                                                                                                                              

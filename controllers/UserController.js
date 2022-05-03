@@ -5,7 +5,7 @@ const bcrypt = require("bcryptjs");
 const { validationResult } = require("express-validator");
 const jwt = require("jsonwebtoken")
 const { message } = require("../common/message");
-const { Email } = require("../utils/Email");
+const { Email, AvailableTemplates } = require("../utils/Email");
 
 
 
@@ -23,7 +23,7 @@ const userCreate = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
     // save the data in database of user 
-    await UserModel.create({
+    const user = await UserModel.create({
       firstName,
       lastName,
       email,
@@ -31,12 +31,35 @@ const userCreate = async (req, res) => {
       userRole
     });
 
-    return res.status(200).json(
-      {
-        message: message.USER_LOGIN,
-        //data: user
-      }
-    );
+    try {
+      //const { email } = req.body
+      const email = new Email();
+
+      await email.setTemplate(AvailableTemplates.REGISTERED_USER, {
+        firstName: `${user.firstName}`,
+        lastName: `${user.lastName}`,
+        password: `${password}`,
+        email: `${user.email}`
+      })
+      await email.sendEmail(user.email);
+      return res.status(201).json({ message: message.USER_REGISTRATION, data: user });
+    } catch (error) {
+      console.log(error);
+      return res.status(201).json({ message: message.USER_REGISTRATION_NO_EMAIL, data: user });
+    }
+    // console.log(email);
+    // const emailClient = new Email();
+    // emailClient.setBody();
+    // emailClient.send(email);
+    // }
+    // }
+
+    //     return res.status(200).json(
+    //       {
+    //         message: message.USER_LOGIN,
+    //         data: user
+    //       }
+    //     );
   } catch (error) {
     console.log(error);
     return res.status(500).json({
@@ -61,7 +84,7 @@ const userLogin = async (req, res) => {
       })
     }
     const isPasswordCheck = await bcrypt.compare(password, user.password);
-    if (!isPasswordCheck) {   
+    if (!isPasswordCheck) {
       return res.status(422).json({
         errors: { message: message.PASSWORD_NOT_MATCH }
       });
@@ -73,19 +96,19 @@ const userLogin = async (req, res) => {
     });
     console.log("user login successfully!")
 
-    try {
-      const { email } = req.body
-      console.log(email);
-      const emailClient = new Email();
-      emailClient.setBody();
-      emailClient.send(email);
-    }
-    catch (error) {
-      return res.status(500).json({
-        success: false,
-        message: message.ERROR_MESSAGE,
-      });
-    }
+    // try {
+    //   const { email } = req.body
+    //   console.log(email);
+    //   const emailClient = new Email();
+    //   emailClient.setBody();
+    //   emailClient.send(email);
+    // }
+    // catch (error) {
+    //   return res.status(500).json({
+    //     success: false,
+    //     message: message.ERROR_MESSAGE,
+    //   });
+    // }
     return res.status(200).json({
       message: message.LOGIN_SUCCESS,
       token: token,
@@ -117,13 +140,13 @@ const userList = async (req, res, next) => {
     let condition = {};
 
     if (search) {
-      condition["firstName"] = { $regex: search, $options: "i" };
+      condition["firstName"] = { $regex: search, $options: "i" };        
     }
 
     //show in organization list
     const user = await UserModel.find(condition)
       .limit(limit * 1)
-      .skip((page - 1) * limit)                        
+      .skip((page - 1) * limit)       
       .select("firstName lastName email password ")
       .sort(sortOrder);
 
@@ -132,7 +155,7 @@ const userList = async (req, res, next) => {
       return res.status(400).json({ message: message.DATA_NOT_FOUND, });
     }
     return res.status(200).json({
-      TotaluserList: totaluserList,  
+      TotaluserList: totaluserList,
       user,
     });
   } catch (error) {
@@ -150,22 +173,40 @@ const userList = async (req, res, next) => {
 
 const userDetails = async (req, res) => {
   try {
-    // show user details
-    const user = await UserModel.find(); 
+    const { params } = req;
+    const { id } = params;
+    const userDetails = await UserModel.findOne({ _id: id })
 
-    if (!user) {
-      return res.status(404).json({
-        errors: { message: message.USER_NOT_FOUND }
-      });
+    if (userDetails) {
+      return res.status(200).json({
+        message: message.USER_DETAILS, userDetails 
+        });
     }
-    return res.status(200).json({
-      data: user,
+    return res.status(404).json({
+      message: message.USER_NOT_FOUND
     });
   } catch (error) {
     return res.status(500).json({
-      message: message.ERROR_MESSAGE
-    })
+      message : message.ERROR_MESSAGE,
+    });
   }
+  // try {
+  //   // show user details
+  //   const user = await UserModel.find(); 
+
+  //   if (!user) {
+  //     return res.status(404).json({
+  //       errors: { message: message.USER_NOT_FOUND }
+  //     });
+  //   }
+  //   return res.status(200).json({
+  //     data: user,
+  //   });
+  // } catch (error) {
+  //   return res.status(500).json({
+  //     message: message.ERROR_MESSAGE
+  //   })
+  // }
 }
 
 /**
@@ -186,7 +227,7 @@ const updateUser = async (req, res, next) => {
       });
     }
     await UserModel.updateOne({ _id: id }, { $set: body })
-    return res.status(200).json({ 
+    return res.status(200).json({
       success: true,
       message: message.USER_DATA_UPDATED,
 
