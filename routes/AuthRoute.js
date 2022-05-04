@@ -12,7 +12,7 @@ router.post("/signup", UserValidations.SignupValidations, Validations.handleVali
     AuthController.adminCreate);
     
 router.post("/login", CheckValidations.checkValidations,  AuthController.adminLogin);
-
+//router.get("/view", AuthController.viewProfile );
 
 
 module.exports = router      

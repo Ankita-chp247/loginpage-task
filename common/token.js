@@ -1,6 +1,6 @@
-const UserModel =  require ("../models/UserModel");
-const { decode } = require ("../common/encode_decode")
-const message = require ("../common/message")
+const UserModel = require("../models/UserModel");
+const { decode } = require("../common/encode_decode")
+const message = require("../common/message")
 
 
 /**
@@ -11,36 +11,33 @@ const message = require ("../common/message")
  * @returns
  */
 
-const tokenVerification = async (req, res, next) => {                             
+const tokenVerification = async (req, res, next) => {
     try {
-        
-       // const { headers: { authorization }, } = req;
+        const {
+            headers: { authorization },
+        } = req;
 
+        const token = authorization.split(" ")[1];
 
-        const token = req.headers['x-access-token'];  
-        console.log(token)
-        if (!token) return res.status(401).json({ 
-            message: message.AUTH_ERROR 
-        });
-        const id  = await decode(token);
+        const { id } = await decode(token);
 
-        console.log(" get " + id)  
-        const user = await UserModel.findById(id)                                                                                                                                                                                          
- 
-        if (!user) {                                                       
-            return res.status(500).json(                                                                                                                              
-                {                                                      
-                    message: message.USER_NOT_FOUND                                                                                                                                                                
-                });    
-        }    
-        //req.user = id;                                                                                        
-      return next();                                                                                                          
-    
-    } catch (error) {                                                                                       
-        console.log(error);                                       
-        return res.status(500).json(                                                                         
+        const userDetails = await UserModel.findById(id);
+        console.log(userDetails._id)
+        if (!userDetails) {
+            return res.status(404).json({
+
+                message: message.DATA_NOT_FOUND,
+            });
+        }
+        req.userId = userDetails._id;
+
+        next();
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json(
             {
-                message: message.INVALID_TOKEN ,
+                message: message.INVALID_TOKEN,
             });
     }
 };

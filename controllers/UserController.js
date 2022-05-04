@@ -6,6 +6,7 @@ const { validationResult } = require("express-validator");
 const jwt = require("jsonwebtoken")
 const { message } = require("../common/message");
 const { Email, AvailableTemplates } = require("../utils/Email");
+const { encode } = require("../common/encode_decode");
 
 
 
@@ -47,19 +48,7 @@ const userCreate = async (req, res) => {
       console.log(error);
       return res.status(201).json({ message: message.USER_REGISTRATION_NO_EMAIL, data: user });
     }
-    // console.log(email);
-    // const emailClient = new Email();
-    // emailClient.setBody();
-    // emailClient.send(email);
-    // }
-    // }
-
-    //     return res.status(200).json(
-    //       {
-    //         message: message.USER_LOGIN,
-    //         data: user
-    //       }
-    //     );
+    
   } catch (error) {
     console.log(error);
     return res.status(500).json({
@@ -89,12 +78,7 @@ const userLogin = async (req, res) => {
         errors: { message: message.PASSWORD_NOT_MATCH }
       });
     }
-    // generate JWT token code                                                
-
-    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
-      expiresIn: "1h"
-    });
-    console.log("user login successfully!")
+        console.log("user login successfully!")
 
     // try {
     //   const { email } = req.body
@@ -111,7 +95,9 @@ const userLogin = async (req, res) => {
     // }
     return res.status(200).json({
       message: message.LOGIN_SUCCESS,
-      token: token,
+      token: `Bearer ${await encode({
+        id: user._id,
+    })}`,
     });
   } catch (error) {
     console.log(error);
@@ -190,23 +176,6 @@ const userDetails = async (req, res) => {
       message : message.ERROR_MESSAGE,
     });
   }
-  // try {
-  //   // show user details
-  //   const user = await UserModel.find(); 
-
-  //   if (!user) {
-  //     return res.status(404).json({
-  //       errors: { message: message.USER_NOT_FOUND }
-  //     });
-  //   }
-  //   return res.status(200).json({
-  //     data: user,
-  //   });
-  // } catch (error) {
-  //   return res.status(500).json({
-  //     message: message.ERROR_MESSAGE
-  //   })
-  // }
 }
 
 /**
@@ -218,7 +187,9 @@ const userDetails = async (req, res) => {
 const updateUser = async (req, res, next) => {
   try {
     const id = req.params.id;
-    const { body } = req
+    const { body, userId } = req
+    console.log("userId",userId)
+    
     const user = await UserModel.find({ _id: { $ne: id }, email: body.email }).select({ "password": 0 })
 
     if (user.length > 0) {

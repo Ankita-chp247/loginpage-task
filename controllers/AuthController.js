@@ -47,9 +47,9 @@ const adminCreate = async (req, res) => {
 
 const adminLogin = async (req, res) => {
   try {
-     // create JWT token 
+    // create JWT token 
 
-    const{userId } = req
+    const { userId } = req
     const token = jwt.sign({ id: userId }, process.env.JWT_SECRET, {
       expiresIn: "1h"
     });
@@ -62,7 +62,7 @@ const adminLogin = async (req, res) => {
     console.log(error);
     return res.status(500).json({
 
-      message: error.message ? error.message : message.ERROR_MESSAGE,
+      message: message.ERROR_MESSAGE,
 
     });
   }
@@ -74,6 +74,8 @@ const adminLogin = async (req, res) => {
  * @returns JsonResponse
  */
 
+// const viewProfile = async(req,res) =>  
+// res.status(200).json(req.user)
 
 
 /**
@@ -82,5 +84,5 @@ const adminLogin = async (req, res) => {
 module.exports = {
   adminCreate,
   adminLogin,
-
+  // viewProfile,
 };
