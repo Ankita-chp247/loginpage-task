@@ -5,9 +5,11 @@ const { Validations } = require('../middleware')
 const { UserValidations } = require("../validations");
 const{ tokenVerification } = require ("../common/token")
 
+const upload = require('../common/upload');
 
-router.post("/signup", UserValidations.SignupValidations, Validations.handleValidationErrors,
-    UserController.userCreate);
+
+router.post("/signup", upload.single("file"), UserValidations.SignupValidations,
+ Validations.handleValidationErrors, UserController.userCreate);
 
 router.post("/login",  UserController.userLogin)
 router.put('/:id', tokenVerification, UserController.updateUser)

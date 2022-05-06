@@ -9,8 +9,6 @@ const { Email, AvailableTemplates } = require("../utils/Email");
 const { encode } = require("../common/encode_decode");
 
 
-
-
 /**
  * user login
  * Create a record
@@ -20,8 +18,11 @@ const { encode } = require("../common/encode_decode");
 
 const userCreate = async (req, res) => {
   try {
-    const { firstName, lastName, email, password, userRole } = req.body
 
+    const { file } = req;
+    console.log(file)
+
+    const { firstName, lastName, email, password, userRole, organizationId } = req.body
     const hashedPassword = await bcrypt.hash(password, 10);
     // save the data in database of user 
     const user = await UserModel.create({
@@ -29,7 +30,9 @@ const userCreate = async (req, res) => {
       lastName,
       email,
       password: hashedPassword,
-      userRole
+      userRole,
+      image: file.filename,
+      organizationId
     });
 
     try {
@@ -123,12 +126,34 @@ const userList = async (req, res, next) => {
       condition["firstName"] = { $regex: search, $options: "i" };
     }
 
-    //show in organization list
-    const user = await UserModel.find(condition)
-      .limit(limit * 1)
-      .skip((page - 1) * limit)
-      .select("firstName lastName email password ")
-      .sort(sortOrder);
+    //aggregation used 
+    const user = await UserModel.aggregate([{
+      $lookup: {
+        from: "organizations",
+        localField: "organizationId",
+        foreignField: "_id",
+        as: "organization",
+      },
+    },
+
+    {
+      $unwind: "$organization",
+    },
+
+    {
+      $project: {
+        name: "$organization.name",
+        username: "$firstName"
+      }
+    }
+    ])
+
+    //show in user list pagination
+    // const user = await UserModel.find(condition)
+    //   .limit(limit * 1)
+    //   .skip((page - 1) * limit)
+    //   .select("firstName lastName email password ")
+    //   .sort(sortOrder);
 
     const totaluserList = await UserModel.countDocuments(condition);
     if (!totaluserList) {
@@ -230,6 +255,7 @@ const deleteUser = async (req, res, next) => {
     });
   }
 };
+
 
 /**
  * Export as a single common js module

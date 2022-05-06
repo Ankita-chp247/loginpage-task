@@ -9,6 +9,15 @@ const UserModelSchema = new Schema({
   email: { type: String, required: true },
   password: { type: String, required: true },
   userRole: { type: String, default: "Admin", required: true, },
+
+  image: { type: Schema.Types.String, required: true },
+  
+  organizationId: {
+    type: Schema.Types.ObjectId,
+    ref: "organizations"
+  },
+
+
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 });
