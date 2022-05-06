@@ -48,7 +48,7 @@ const userCreate = async (req, res) => {
       console.log(error);
       return res.status(201).json({ message: message.USER_REGISTRATION_NO_EMAIL, data: user });
     }
-    
+
   } catch (error) {
     console.log(error);
     return res.status(500).json({
@@ -78,26 +78,20 @@ const userLogin = async (req, res) => {
         errors: { message: message.PASSWORD_NOT_MATCH }
       });
     }
-        console.log("user login successfully!")
+    const keyaccsess = {
+      id: user._Id
+    }
+    const token = jwt.sign(keyaccsess, process.env.JWT_SECRET, {
+      expiresIn: "1h"
+    });
 
-    // try {
-    //   const { email } = req.body
-    //   console.log(email);
-    //   const emailClient = new Email();
-    //   emailClient.setBody();
-    //   emailClient.send(email);
-    // }
-    // catch (error) {
-    //   return res.status(500).json({
-    //     success: false,
-    //     message: message.ERROR_MESSAGE,
-    //   });
-    // }
+    console.log("user login successfully!")
     return res.status(200).json({
       message: message.LOGIN_SUCCESS,
-      token: `Bearer ${await encode({
-        id: user._id,
-    })}`,
+      token
+      //token: `Bearer ${await encode({
+      //id: user._id,
+      //})}`,
     });
   } catch (error) {
     console.log(error);
@@ -126,13 +120,13 @@ const userList = async (req, res, next) => {
     let condition = {};
 
     if (search) {
-      condition["firstName"] = { $regex: search, $options: "i" };        
+      condition["firstName"] = { $regex: search, $options: "i" };
     }
 
     //show in organization list
     const user = await UserModel.find(condition)
       .limit(limit * 1)
-      .skip((page - 1) * limit)       
+      .skip((page - 1) * limit)
       .select("firstName lastName email password ")
       .sort(sortOrder);
 
@@ -165,15 +159,15 @@ const userDetails = async (req, res) => {
 
     if (userDetails) {
       return res.status(200).json({
-        message: message.USER_DETAILS, userDetails 
-        });
+        message: message.USER_DETAILS, userDetails
+      });
     }
     return res.status(404).json({
       message: message.USER_NOT_FOUND
     });
   } catch (error) {
     return res.status(500).json({
-      message : message.ERROR_MESSAGE,
+      message: message.ERROR_MESSAGE,
     });
   }
 }
@@ -188,8 +182,8 @@ const updateUser = async (req, res, next) => {
   try {
     const id = req.params.id;
     const { body, userId } = req
-    console.log("userId",userId)
-    
+    console.log("userId", userId)
+
     const user = await UserModel.find({ _id: { $ne: id }, email: body.email }).select({ "password": 0 })
 
     if (user.length > 0) {

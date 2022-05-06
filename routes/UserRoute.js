@@ -13,6 +13,6 @@ router.post("/login",  UserController.userLogin)
 router.put('/:id', tokenVerification, UserController.updateUser)
 router.delete('/:id',tokenVerification, UserController.deleteUser)
 router.get('/list', tokenVerification,UserController.userList)
-router.get('/detail', UserController.userDetails)
+router.get('/detail/:id', UserController.userDetails)
 
 module.exports = router      

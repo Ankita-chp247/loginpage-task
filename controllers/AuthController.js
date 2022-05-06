@@ -74,9 +74,14 @@ const adminLogin = async (req, res) => {
  * @returns JsonResponse
  */
 
- const viewProfile = async(req,res) =>  
- res.status(200).json(req.user)
+ const viewProfile = async(req,res) =>  {
 
+ console.log("userId", req.userId)
+ const userDetails = await UserModel.findOne({ _id: req.userId})
+
+res.status(200).json({userDetails})
+ }
+ 
 
 /**
  * Export as a single common js module
@@ -84,5 +89,5 @@ const adminLogin = async (req, res) => {
 module.exports = {
   adminCreate,
   adminLogin,
-   viewProfile,
+  viewProfile,
 };

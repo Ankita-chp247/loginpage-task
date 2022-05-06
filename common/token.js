@@ -21,6 +21,8 @@ const tokenVerification = async (req, res, next) => {
 
         const { id } = await decode(token);
 
+        console.log("*tttttttttttttttttttid",id)
+
         const userDetails = await UserModel.findById(id);
         console.log(userDetails._id)
         if (!userDetails) {
@@ -29,7 +31,7 @@ const tokenVerification = async (req, res, next) => {
                 message: message.DATA_NOT_FOUND,
             });
         }
-        req.userId = userDetails._id;
+        req.userId = id;
 
         next();
 
