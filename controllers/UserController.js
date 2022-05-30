@@ -110,7 +110,7 @@ const userLogin = async (req, res) => {
  * @returns JsonResponse
  */
 
- const userList = async (req, res, next) => {
+const userList = async (req, res, next) => {
   try {
 
     const { search = "", page = 1, limit = 10, sort, sortBy } = req.query;
@@ -136,17 +136,33 @@ const userLogin = async (req, res) => {
       },
     },
 
-    // {
-    //   $unwind: "$organization",
-    // },
+    {
+      $unwind: "$organization",
+    },
 
     // {
     //   $project: {
     //     name: "$organization.country",
-    //     username: "$firstName"
-
+    //     orgstate:"$organization.state",
+    //     city: "$organization.city",
+    //     username: "$firstName",
+    //     userlastName: "$lastName",
+    //     email: "$email",
+    //     image: "$image"
     //   }
     // }
+
+    {
+      $group: {
+        _id: {
+          organizationid: "$organizationId",
+          state: "$organization.state",
+          city: "$organization.city",
+          username: "$firstName",
+          image: "$image"
+        }
+      }
+    },
     ])
 
     //show in user list pagination
@@ -214,7 +230,7 @@ const updateUser = async (req, res, next) => {
 
     if (user.length > 0) {
       return res.status(404).json({
-        message: message.EMAIL_ALREADY_EXISTS, 
+        message: message.EMAIL_ALREADY_EXISTS,
       });
     }
     await UserModel.updateOne({ _id: id }, { $set: body })

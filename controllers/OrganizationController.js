@@ -66,10 +66,6 @@ const organizationList = async (req, res, next) => {
       condition[searchBy] = { $regex: search, $options: "i" };
     }
 
-    //user
-    // if (users) {
-    //   condition = { user: users.split(',') }
-    // }
     //show in organization list
     const organization = await OrganizationModel.find(condition)
       .populate("user")

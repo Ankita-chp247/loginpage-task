@@ -19,16 +19,6 @@ const OrganizationModelSchema = new Schema({
   city: {
     type: String, require: true,
   },
-
-
-  organizationId: {
-    type: Schema.Types.ObjectId,
-    ref: "organizations"
-  },
-
-
-
-
   createdAt: {
     type: Date, default: Date.now
   },
