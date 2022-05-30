@@ -31,6 +31,10 @@ const createOrganization = async (req, res, next) => {
     })
     console.log("Organization created successfully!");
 
+    //  return res.render("login/organization",{
+    //   data:organization
+    //  })
+
   } catch (error) {
     return res.status(500).json({
       message: message.ERROR_MESSAGE,

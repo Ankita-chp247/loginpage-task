@@ -1,0 +1,142 @@
+<style>
+    body {
+        background-color: #eee;
+        color: #444;
+        font-family: sans-serif;
+    }
+
+    .list ul:nth-child(odd) {
+        background-color: #ddd;
+    }
+
+    .list ul:nth-child(even) {
+        background-color: #fff;
+    }
+
+    /* big */
+    @media screen and (min-width:600px) {
+        .list {
+            display: table;
+            margin: 1em;
+        }
+        .list ul {
+            display: table-row;
+        }
+        .list ul:first-child li {
+            background-color: rgb(68, 68, 68);
+            color: #fff;
+        }
+        .list ul>li {
+            display: table-cell;
+            padding: .5em 1em;
+            width: 1000px;
+        }
+    }
+    /* small */
+    @media screen and (max-width:599px) {
+        .list ul {
+            border: solid 1px #ccc;
+            display: block;
+            list-style: none;
+            margin: 1em;
+            padding: .5em 1em;
+        }
+        .list ul:first-child {
+            display: none;
+        }
+
+        .list ul>li {
+            display: block;
+            padding: .25em 0;
+        }
+        .list ul:nth-child(odd)>li+li {
+            border-top: solid 1px #ccc;
+        }
+        .list ul:nth-child(even)>li+li {
+            border-top: solid 1px #eee;
+        }
+        .list ul>li:before {
+            color: #000;
+            content: attr(data-label);
+            display: inline-block;
+            font-size: 75%;
+            font-weight: bold;
+            text-transform: capitalize;
+            vertical-align: top;
+            width: 50%;
+        }
+        .list p {<br></br>
+            margin: -1em 0 0 50%;
+        }
+    }
+        /* tiny */
+    @media screen and (max-width:349px) {
+
+        .list ul>li:before {
+            display: block;
+        }
+
+        .list p {
+            margin: 0;
+        }
+
+    }
+</style>
+<br></br>
+<br>
+<form action="/v2/org" method="post"></form>
+<h2>Organization list</h2>
+
+<div class="list">
+    <ul>
+        <li>Name</li>
+        <li>Country</li>
+        <li>State</li>
+        <li>City</li>
+    </ul>
+    <ul>
+        <li data-label="name">Ankita</li>
+        <li data-label="country">India</li>
+        <li data-label="state">MP</li>
+        <li data-label="city">Satna</li>
+        </li>
+    </ul>
+    <ul>
+        <li data-label="name">Adarsh</li>
+        <li data-label="country">India</li>
+        <li data-label="state">MP</li>
+        <li data-label="city">Jabalpur</li>
+        </li>
+    </ul>
+    <ul>
+        <li data-label="name">Namrata</li>
+        <li data-label="country">India</li>
+        <li data-label="state">MP</li>
+        <li data-label="city">Satna</li>
+        </li>
+    </ul>
+    <ul>
+        <li data-label="name">Ankita</li>
+        <li data-label="country">India</li>
+        <li data-label="state">MP</li>
+        <li data-label="city">Satna</li>
+        </li>
+    </ul>
+    <ul>
+        <li data-label="name">Ankita</li>
+        <li data-label="country">India</li>
+        <li data-label="state">MP</li>
+        <li data-label="city">Indore</li>
+        </li>
+    </ul>
+    <ul>
+        <li data-label="user">Shalini</li>
+        <li data-label="name">India</li>
+        <li data-label="country">MP</li>
+        <li data-label="city">Bhopal</li>
+        </li>
+    </ul>
+    </form>
+</div>
+        
+        

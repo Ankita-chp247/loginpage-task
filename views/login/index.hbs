@@ -1,23 +1,164 @@
 <style>
-  body {
-    background-color: rgb(240, 255, 252);
+  :root {
+    --link-color: #6C4BB4;
+    --primary-color-opacity: #e9d5ff;
+    --white-shade: #f0f8ff;
+    --secondary-color: #1e293b;
+    --primary-padding: 8px;
+    --pilled-shape-radius: 40px;
+    --color1: #36EB84;
+    --color2: #2BCDB5;
+    --primary-gradient: linear-gradient(to right, var(--color2), var(--color1))
   }
-</style>
-<div class="row mt-5"> 
-  <div class="col-4 offset-4">
-    <div class="mb-md-5 mt-md-4 pb-5">
 
-      <form action="/v2/user/login " method="post">         
-        <div class="form-group">
-          <label for="email">Email </label> 
-          <input type="email" class="form-control" id="email" placeholder="Enter email" name="email" />
-          <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
-        </div>
-        <div class="form-group">         
-          <label for="password">Password</label>
-          <input type="password" class="form-control" id="password" placeholder="Enter Password" name="password" />
-        </div>
-        <button type="submit" class="btn btn-primary mt-4">Submit</button>
-      </form>
+  body {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: sans-serif;
+    background: linear-gradient(to right, #381e3b, #434343);
+  }
+
+  .container {
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 2px 2px 10px #353636;
+    background: #fff;
+  }
+
+  .item-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .log-in {
+    font-size: 35px;
+    color: var(--secondary-color);
+  }
+
+  .log-in::after {
+    content: "";
+    display: block;
+    width: 60%;
+    height: 3px;
+    margin-top: 8px;
+    background: var(--primary-gradient);
+    margin-inline: auto;
+  }
+
+  .form-input {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 10px;
+  }
+
+  input[type="text"],
+  input[type="password"] {
+    padding: var(--primary-padding);
+    width: 300px;
+    border-radius: var(--pilled-shape-radius);
+    border: none;
+    background: #E7FDF0;
+    color: var(--secondary-color);
+    outline: none;
+    border: 1px solid transparent;
+  }
+
+  @media only screen and (max-width: 300px) {
+
+    input[type="text"],
+    input[type="password"] {
+      width: 200px;
+    }
+  }
+
+  input[type="text"]:focus-visible,
+  input[type="password"]:focus-visible {
+    border: 1px solid var(--color1);
+    background: transparent;
+  }
+
+  .label {
+    color: var(--secondary-color);
+    margin-bottom: 3px;
+  }
+
+  .display-space-between {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 10px 0 10px 0;
+  }
+
+  .item-container button {
+    border-radius: 50%;
+    border: none;
+    padding: 5px;
+    background: transparent;
+    margin-left: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 2px 2px 5px #353636;
+  }
+
+  button[type="submit"] {
+    width: 100%;
+    padding: var(--primary-padding);
+    border-radius: var(--pilled-shape-radius);
+    border: none;
+    background: var(--primary-gradient);
+    color: var(--white-shade);
+    margin: 10px 0 10px 0;
+  }
+  .chekbox-label {
+    font-size: 14px;
+  }
+
+  a {
+    text-decoration: none;
+    color: var(--link-color);
+    font-size: 14px;
+  }
+
+</style>
+<body>
+  <div class="container">
+    <div class="item-container">
+      <form action="/v2/user " method="post">
+        <h2 class="log-in">Log in</h2>
+    </div>
+    <div class="item-container">
+    </div>
+    <div class="item-container">
+      <p>Please enter your login and password</p>
+    </div>
+    <div class="form-input">
+      <input type="text" class="form-control" name="username" id="username" placeholder="Enter your username" required>
+    </div>
+    <div class="form-input">
+      <input type="password" class="form-control" name="password" id="password" placeholder="Enter Your Password"
+        required>
+    </div>
+    <div class="display-space-between">
+      <div>
+        <input type="checkbox" checked>
+        <label for="password" class="chekbox-label">Remember Me</label>
+      </div>
+      <div>
+        <a href="#">Forget password</a>
+      </div>
+    </div>
+    <div>
+      <button type="submit">submit</button>
+    </div>
+    </form>
+    <div class="display-space-between">
+      {{!-- New User?
+      <a href="/signup">Signup Now</a> --}}
+
     </div>
   </div>
+</body>

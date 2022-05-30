@@ -123,7 +123,7 @@ class Email {
 
   async sendEmail(email) {
     if (!email) {
-      throw new Error('Please provide email.');
+      throw new Error('Please provide email.'); 
     }
     const mailOption = {
     from: `"Test" <${process.env.EMAIL_USERNAME}`,

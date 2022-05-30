@@ -33,7 +33,7 @@ app.engine(
   ".hbs",
   engine({
     extname: ".hbs",
-    defaultLayout: "main",
+    defaultLayout: "",
   })
 )
 
@@ -42,10 +42,27 @@ app.use("/v2", routes)
 
 app.set("view engine", "hbs")
 app.set("views", path.join(__dirname, "views"));
+ 
+// app.get("/", async (req, res) => {
+//   res.render("login/index")
+// })
 
-app.get("/", async (req, res) => {
-  res.render("login/index")
-})
+app.get("/", async(req, res,next) => {                                                                                                                                                                                                                                                                                                                                                                                                                       
+  res.render("login/index",{                                                                                                                                                                                                                                  
+  })                                                                                                        
+  next();                                                                          
+});                                                    
+    
+app.get("/", async(req, res) => {                                                                                                                                                                                                                                                
+  res.render("login/organization",{                                                                                                                                                                     
+  })     
+});
+
+
+
+
+
+
 
 mongoose
   .connect(process.env.MONGODB_URI)
